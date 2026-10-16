@@ -242,12 +242,12 @@
         <option value="12">Electronics I</option>
         <option value="13">Calculus II</option>
         <option value="14">Modern American Literature</option>
-        <option value="15">US Histroy II</option>option>
-        <option value="16">Database Systems</option>option>
-        <option value="17">Power Electronics</option>option>
-        <option value="18">Multivariable Calculus</option>option>
-        <option value="19">British Literature</option>option>
-        <option value="20">World History II</option>option>
+        <option value="15">US History II</option>
+        <option value="16">Database Systems</option>
+        <option value="17">Power Electronics</option>
+        <option value="18">Multivariable Calculus</option>
+        <option value="19">British Literature</option>
+        <option value="20">World History II</option>
 
       </select><br><br>
       <input class="but1" type="submit" value="Submit">
@@ -262,7 +262,7 @@
     const yearInput = document.querySelector('#year');
     yearInput.addEventListener('input', () => {
       const year = parseInt(yearInput.value);
-      if (year > 2023) {
+      if (year > 2026) {
         yearInput.setCustomValidity('Please Enter a valid Year');
       } else {
         yearInput.setCustomValidity('');

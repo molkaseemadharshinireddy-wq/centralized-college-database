@@ -32,11 +32,27 @@ app.post('/', (req, res) => {
   const { instructor_id, instructor_name, department_id, action } = req.body;
 
   if (action === 'add') {
-    // Insert new instructor into the database
-    const sql = `INSERT INTO instructor (instructor_id, instructor_name, department_id) 
-                 VALUES (${instructor_id}, '${instructor_name}', ${department_id})`;
-    connection.query(sql, (err, result) => {
-      if (err) throw err;
+    const instructorId = Number(instructor_id);
+    const departmentId = Number(department_id);
+    const instructorName = typeof instructor_name === 'string' ? instructor_name.trim() : '';
+
+    if (!Number.isInteger(instructorId) || instructorId <= 0 ||
+        !Number.isInteger(departmentId) || departmentId <= 0 || !instructorName) {
+      res.status(400).send('Enter a valid instructor ID, instructor name, and department ID.');
+      return;
+    }
+
+    const sql = 'INSERT INTO instructor (instructor_id, instructor_name, department_id) VALUES (?, ?, ?)';
+    connection.query(sql, [instructorId, instructorName, departmentId], (err) => {
+      if (err) {
+        if (err.code === 'ER_NO_REFERENCED_ROW_2') {
+          res.status(400).send(`Department ID ${departmentId} does not exist.`);
+          return;
+        }
+        console.error('Could not add instructor:', err.message);
+        res.status(500).send('Could not add instructor.');
+        return;
+      }
       console.log('New instructor added to the database');
       res.redirect('/');
     });
@@ -44,7 +60,11 @@ app.post('/', (req, res) => {
     // Check if there are at least 2 instructors in the database
     const sql = 'SELECT COUNT(*) as num_instructors FROM instructor';
     connection.query(sql, (err, result) => {
-      if (err) throw err;
+      if (err) {
+        console.error('Could not check instructor count:', err.message);
+        res.status(500).send('Could not delete instructor.');
+        return;
+      }
       const { num_instructors } = result[0];
 
       if (num_instructors < 2) {
@@ -53,14 +73,20 @@ app.post('/', (req, res) => {
         res.send('Cannot delete instructor');
       } else {
         // Delete instructor from the database
-        const sql = `DELETE FROM instructor WHERE instructor_id = ${instructor_id}`;
-        connection.query(sql, (err, result) => {
-          if (err) throw err;
+        const sql = 'DELETE FROM instructor WHERE instructor_id = ?';
+        connection.query(sql, [instructor_id], (err) => {
+          if (err) {
+            console.error('Could not delete instructor:', err.message);
+            res.status(500).send('Could not delete instructor.');
+            return;
+          }
           console.log(`Instructor ${instructor_id} deleted from the database`);
           res.redirect('/');
         });
       }
     });
+  } else {
+    res.status(400).send('Choose whether to add or delete an instructor.');
   }
 });
 

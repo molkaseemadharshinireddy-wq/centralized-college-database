@@ -154,7 +154,7 @@ The project dependencies, including Express and the `mysql2` driver used by the 
 ### 3. Configure the Database
 
 1. Start MySQL Server. The configured MySQL account must be allowed to create databases and tables.
-2. The `npm start` command creates the `CCD` database (or the database selected by `DB_NAME`) and any missing tables from `DatabaseDesign.sql`.
+2. The `npm start` command creates the `CCD` database (or the database selected by `DB_NAME`), any missing tables, the default departments (IDs 1-5), and the 20 courses shown in the student form. Course records are added without an assigned instructor; existing department and course records are preserved.
 3. Configure the database connection using environment variables before starting the app. The defaults are `DB_HOST=localhost`, `DB_PORT=3306`, `DB_USER=root`, `DB_PASSWORD=#`, and `DB_NAME=CCD`. `npm start` loads variables from a `.env` file in the project root before initializing the database and starting the services. Existing shell environment variables take precedence.
 4. Avoid committing real credentials to version control. The root `.env` file is ignored by Git.
 
@@ -190,7 +190,7 @@ The startup script initializes the database before starting the student, search,
 index.html
 ```
 
-To initialize the database without starting the servers, run `npm run db:setup`.
+To initialize the database without starting the servers, run `npm run db:setup`. This also adds any missing default departments and courses, making the student form's course IDs valid.
 
 ## Security and Data Integrity
 

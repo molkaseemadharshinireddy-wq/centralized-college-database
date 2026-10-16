@@ -29,20 +29,32 @@ app.get('/', (req, res) => {
 });
 
 app.post('/submit', (req, res) => {
-  const student_id = req.body.student_id;
-  const course_id = req.body.course_id;
-  const student_name = req.body.student_name;
-  const year = req.body.year;
-  const age=req.body.age;
-  const address=req.body.address;
+  const studentId = Number(req.body.student_id);
+  const courseId = Number(req.body.course_id);
+  const studentName = typeof req.body.student_name === 'string' ? req.body.student_name.trim() : '';
+  const year = Number(req.body.year);
+  const age = Number(req.body.age);
+  const address = typeof req.body.address === 'string' ? req.body.address.trim() : '';
+
+  if (!Number.isInteger(studentId) || studentId <= 0 ||
+      !Number.isInteger(courseId) || courseId <= 0 ||
+      !studentName || !Number.isInteger(year) ||
+      !Number.isInteger(age) || age <= 0 || !address) {
+    res.status(400).send('Enter valid student details and select a course.');
+    return;
+  }
 
   const sql = 'INSERT INTO student (student_id, course_id, student_name, year,age,address) VALUES (?, ?, ?, ?, ?, ?)';
-  const values = [student_id, course_id, student_name, year, age, address];
+  const values = [studentId, courseId, studentName, year, age, address];
 
   db.query(sql, values, (err, result) => {
     if (err) {
-      console.error('Error inserting data into MySQL database: ' + err.stack);
-      res.status(500).send('Error inserting data into MySQL database');
+      if (err.code === 'ER_NO_REFERENCED_ROW_2') {
+        res.status(400).send(`Course ID ${courseId} does not exist. Run npm run db:setup and try again.`);
+        return;
+      }
+      console.error('Error inserting student into MySQL database:', err.message);
+      res.status(500).send('Error inserting student data into the database.');
       return;
     }
     console.log('Data inserted into MySQL database with ID ' + result.insertId);
