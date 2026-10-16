@@ -1,11 +1,14 @@
 # Centralized-College-Database
-DBMS Project IIIT-Allahabad Sem 4 
+DBMS Project MNNIT-Allahabad Sem 5
 
 Make sure you install the right Node modules for the Project.
 
 Project Members:
-1>Aditya Yalamanchi (Me)
-2>John Ambooken (lostquark on GitHub)
+1>Manshi Sahu 
+2>M.Dharshini
+3>Khushi Chauhan
+4>Mahak Garg
+
 
 Tech Stack used
 ->Node.js (backend)
