@@ -1,6 +1,6 @@
 # Centralized College Database
 
-**DBMS Project — MNNIT Allahabad | Semester 5**
+**SEPM Project — MNNIT Allahabad | Semester 5**
 
 ## Project Team
 
@@ -221,7 +221,7 @@ To initialize the database without starting the servers, run `npm run db:setup`.
 
 ## Acknowledgements
 
-Developed as a Semester 5 DBMS project at **Motilal Nehru National Institute of Technology Allahabad (MNNIT Allahabad)**.
+Developed as a Semester 5 SEPM project at **Motilal Nehru National Institute of Technology Allahabad (MNNIT Allahabad)**.
 
 ---
 
