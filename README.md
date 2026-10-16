@@ -155,8 +155,8 @@ The project dependencies, including Express and the `mysql2` driver used by the 
 
 1. Start MySQL Server. The configured MySQL account must be allowed to create databases and tables.
 2. The `npm start` command creates the `CCD` database (or the database selected by `DB_NAME`) and any missing tables from `DatabaseDesign.sql`.
-3. Configure the database connection using environment variables before starting the app. The defaults are `DB_HOST=localhost`, `DB_PORT=3306`, `DB_USER=root`, `DB_PASSWORD=#`, and `DB_NAME=CCD`.
-4. Avoid committing real credentials to version control. Set credentials in your shell or another local environment configuration; the application does not load `.env` files automatically.
+3. Configure the database connection using environment variables before starting the app. The defaults are `DB_HOST=localhost`, `DB_PORT=3306`, `DB_USER=root`, `DB_PASSWORD=#`, and `DB_NAME=CCD`. `npm start` loads variables from a `.env` file in the project root before initializing the database and starting the services. Existing shell environment variables take precedence.
+4. Avoid committing real credentials to version control. The root `.env` file is ignored by Git.
 
 Example environment variables:
 

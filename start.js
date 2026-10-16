@@ -3,6 +3,8 @@ const path = require('path');
 const { spawn } = require('child_process');
 const mysql = require('mysql2');
 
+require('dotenv').config({ path: path.join(__dirname, '.env') });
+
 const databaseName = process.env.DB_NAME || 'CCD';
 const databaseConfig = {
   host: process.env.DB_HOST || 'localhost',
