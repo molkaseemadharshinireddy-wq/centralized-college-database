@@ -1,15 +1,18 @@
 const express = require('express');
-const mysql = require('mysql');
+const mysql = require('mysql2');
 const path = require('path');
 const app = express();
 
+const dbConfig = {
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '#',
+    port: Number(process.env.DB_PORT) || 3306,
+    database: process.env.DB_NAME || 'CCD'
+};
+
 // Create a connection to the MySQL database
-const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '#',
-    database: 'CCD'
-});
+const connection = mysql.createConnection(dbConfig);
 
 // Connect to the database
 connection.connect((err) => {
@@ -79,6 +82,7 @@ app.get('/search', (req, res) => {
 });
 
 // Start the server
-app.listen(4000, () => {
-    console.log('Server started on port 4000');
+const port = Number(process.env.SEARCH_PORT) || 4000;
+app.listen(port, () => {
+    console.log(`Search server started on port ${port}`);
 });

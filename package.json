@@ -4,6 +4,8 @@
   "description": "A web-based college database management system using Node.js, Express, and MySQL",
   "main": "script.js",
   "scripts": {
+    "start": "node start.js",
+    "db:setup": "node start.js --setup-only",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "M.Dharshini,Manshi Sahu,Khushi Chauhan,Mahak Garg",
@@ -12,7 +14,7 @@
     "animejs": "^3.2.1",
     "body-parser": "^1.20.2",
     "express": "^4.18.2",
-    "mysql": "^2.18.1"
+    "mysql2": "^3.24.6"
   },
   "devDependencies": {
     "concurrently": "^8.0.1"

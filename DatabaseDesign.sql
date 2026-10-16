@@ -1,16 +1,16 @@
-CREATE TABLE department (
+CREATE TABLE IF NOT EXISTS department (
   department_id INT PRIMARY KEY,
   department_name VARCHAR(255)
 );
 
-CREATE TABLE instructor (
+CREATE TABLE IF NOT EXISTS instructor (
   instructor_id INT PRIMARY KEY,
   instructor_name VARCHAR(255),
   department_id INT,
   FOREIGN KEY (department_id) REFERENCES department(department_id)
 );
 
-CREATE TABLE courses (
+CREATE TABLE IF NOT EXISTS courses (
   course_id INT PRIMARY KEY,
   course_name VARCHAR(255),
   department_id INT,
@@ -20,7 +20,7 @@ CREATE TABLE courses (
   FOREIGN KEY (instructor_id) REFERENCES instructor(instructor_id)
 );
 
-CREATE TABLE student (
+CREATE TABLE IF NOT EXISTS student (
   student_id INT,
   course_id INT,
   PRIMARY KEY (student_id, course_id),

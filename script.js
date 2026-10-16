@@ -1,17 +1,20 @@
 const express = require('express');
-const mysql = require('mysql');
+const mysql = require('mysql2');
 const path = require('path');
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '#',
-  database: 'CCD'
-});
+const dbConfig = {
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '#',
+  port: Number(process.env.DB_PORT) || 3306,
+  database: process.env.DB_NAME || 'CCD'
+};
+
+const db = mysql.createConnection(dbConfig);
 
 db.connect((err) => {
   if (err) {

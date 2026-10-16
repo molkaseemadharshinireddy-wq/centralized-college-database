@@ -149,46 +149,48 @@ If the repository contains a `package.json`, run:
 npm install
 ```
 
-If dependencies are not listed in `package.json`, install the packages required by the source code. For a typical Express application using MySQL 2:
-
-```bash
-npm install express mysql2
-```
-
-Install any additional packages imported by the project source files. D3.js and anime.js may be loaded in the frontend or managed through npm, depending on the project's implementation.
+The project dependencies, including Express and the `mysql2` driver used by the server scripts, are listed in `package.json`.
 
 ### 3. Configure the Database
 
-1. Start MySQL Server.
-2. Create the database using the SQL schema or setup script provided with the project.
-3. Configure the database host, username, password, and database name for the application.
-4. Avoid committing real credentials to version control. Prefer environment variables or a local `.env` file that is excluded from Git.
+1. Start MySQL Server. The configured MySQL account must be allowed to create databases and tables.
+2. The `npm start` command creates the `CCD` database (or the database selected by `DB_NAME`) and any missing tables from `DatabaseDesign.sql`.
+3. Configure the database connection using environment variables before starting the app. The defaults are `DB_HOST=localhost`, `DB_PORT=3306`, `DB_USER=root`, `DB_PASSWORD=#`, and `DB_NAME=CCD`.
+4. Avoid committing real credentials to version control. Set credentials in your shell or another local environment configuration; the application does not load `.env` files automatically.
 
 Example environment variables:
 
 ```env
 DB_HOST=localhost
+DB_PORT=3306
 DB_USER=your_mysql_username
 DB_PASSWORD=your_mysql_password
-DB_NAME=your_database_name
-PORT=3000
+DB_NAME=CCD
 ```
 
-The actual database name and setup commands must match the project's SQL files and source code.
+On Windows PowerShell, set the values for the current terminal session, for example:
+
+```powershell
+$env:DB_USER = "your_mysql_username"
+$env:DB_PASSWORD = "your_mysql_password"
+```
 
 ### 4. Start the Application
 
-Run the command specified by the project's `package.json`. For a simple project whose entry point is `script.js`, use:
+From the project directory, install the dependencies and start all three application servers:
 
 ```bash
-node script.js
+npm install
+npm start
 ```
 
-Then open the local URL shown by the application in your browser, typically:
+The startup script initializes the database before starting the student, search, and instructor services on ports 3000, 4000, and 5000. You can override these ports with `PORT`, `SEARCH_PORT`, and `INSTRUCTOR_PORT`. Open `index.html` in your browser to access the homepage:
 
 ```text
-http://localhost:3000
+index.html
 ```
+
+To initialize the database without starting the servers, run `npm run db:setup`.
 
 ## Security and Data Integrity
 
