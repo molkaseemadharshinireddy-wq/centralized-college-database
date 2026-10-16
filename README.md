@@ -1,6 +1,6 @@
 # Centralized College Database
 
-**DBMS Project — MNNIT Allahabad | Semester 5**
+**SEPM Project — MNNIT Allahabad | Semester 5**
 
 ## Project Team
 
