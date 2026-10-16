@@ -201,54 +201,33 @@
     <form action="http://localhost:3000/submit" method="POST">
 
       <div class="user-box">
-        <input type="number" id="student_id" name="student_id" required><br><br>
+        <input type="number" id="student_id" name="student_id" min="1" step="1" required><br><br>
         <label for="student_id">Student ID:</label>
       </div>
 
       <div class="user-box">
-        <input type="text" id="student_name" name="student_name" required><br><br>
+        <input type="text" id="student_name" name="student_name" maxlength="255" required><br><br>
         <label for="student_name">Student Name:</label>
       </div>
 
       <div class="user-box">
-        <input type="number" id="age" name="age" required><br><br>
+        <input type="number" id="age" name="age" min="1" max="120" step="1" required><br><br>
         <label for="age">Age:</label>
       </div>
 
       <div class="user-box">
-        <input type="text" id="address" name="address" required><br><br>
+        <input type="text" id="address" name="address" maxlength="255" required><br><br>
         <label for="address">Address:</label>
       </div>
 
       <div class="user-box">
-        <input type="text" id="year" name="year" required><br><br>
+        <input type="number" id="year" name="year" min="1" step="1" required><br><br>
         <label for="year">Year:</label>
       </div>
 
       <label for="course_id" style="color:white">Course Name:</label>
       <select id="course_id" name="course_id" required>
-        <option value="">--Select Course--</option>
-        <option value="1">Introduction to Computer Science</option>
-        <option value="2">Digital Logic Design</option>
-        <option value="3">Calculus I</option>
-        <option value="4">Introduction to Literature</option>
-        <option value="5">US History I</option>
-        <option value="6">Data Structures and Algorithms</option>
-        <option value="7">Power Systems</option>
-        <option value="8">Linear Algebra</option>
-        <option value="9">Shakespearean Literature</option>
-        <option value="10">World History I</option>
-        <option value="11">Computer Networks</option>
-        <option value="12">Electronics I</option>
-        <option value="13">Calculus II</option>
-        <option value="14">Modern American Literature</option>
-        <option value="15">US History II</option>
-        <option value="16">Database Systems</option>
-        <option value="17">Power Electronics</option>
-        <option value="18">Multivariable Calculus</option>
-        <option value="19">British Literature</option>
-        <option value="20">World History II</option>
-
+        <option value="">Loading courses...</option>
       </select><br><br>
       <input class="but1" type="submit" value="Submit">
 
@@ -256,13 +235,14 @@
     </form>
   </div>
 
-  <div id="success-message"></div>
+  <div id="success-message" role="status" aria-live="polite"></div>
 
   <script>
     const yearInput = document.querySelector('#year');
+    yearInput.max = new Date().getFullYear();
     yearInput.addEventListener('input', () => {
       const year = parseInt(yearInput.value);
-      if (year > 2026) {
+      if (year > new Date().getFullYear()) {
         yearInput.setCustomValidity('Please Enter a valid Year');
       } else {
         yearInput.setCustomValidity('');
@@ -273,6 +253,33 @@
   <script>
     const form = document.querySelector('form');
     const successMessage = document.querySelector('#success-message');
+    const courseSelect = document.querySelector('#course_id');
+    const apiBase = window.location.protocol === 'file:' ? 'http://localhost:3000' : '';
+
+    fetch(`${apiBase}/courses`)
+      .then(async response => {
+        if (!response.ok) {
+          throw new Error(await response.text());
+        }
+        return response.json();
+      })
+      .then(courses => {
+        courseSelect.replaceChildren(new Option('--Select Course--', ''));
+        for (const course of courses) {
+          courseSelect.add(new Option(
+            `${course.course_name} (${course.department_name})`,
+            course.course_id
+          ));
+        }
+        if (courses.length === 0) {
+          courseSelect.replaceChildren(new Option('No valid courses available', ''));
+        }
+      })
+      .catch(error => {
+        console.error('Could not load courses:', error);
+        courseSelect.replaceChildren(new Option('Could not load courses', ''));
+        successMessage.textContent = 'Courses could not be loaded. Please try again later.';
+      });
 
     form.addEventListener('submit', (event) => {
       event.preventDefault(); // Prevent the default form submission behavior
@@ -293,20 +300,22 @@
         course_id: courseId
       };
 
-      fetch('/submit', {
+      fetch(`${apiBase}/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
       })
-        .then(response => response.text())
-        .then(data => {
-          successMessage.textContent = data;
+        .then(async response => {
+          const message = await response.text();
+          successMessage.textContent = message;
+          successMessage.style.color = response.ok ? 'green' : 'red';
         })
         .catch(error => {
           console.error(error);
-          successMessage.textContent = 'Error inserting data';
+          successMessage.textContent = 'Could not submit student data. Please try again.';
+          successMessage.style.color = 'red';
         });
     });
 

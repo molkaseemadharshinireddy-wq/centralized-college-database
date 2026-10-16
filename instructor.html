@@ -53,6 +53,19 @@ border-bottom: 1px solid #fff;
 outline: none;
 background: transparent;
 }
+.login-box .user-box select {
+width: 100%;
+padding: 10px 0;
+margin-bottom: 30px;
+color: #fff;
+border: none;
+border-bottom: 1px solid #fff;
+outline: none;
+background: transparent;
+}
+.login-box .user-box select option {
+color: #000;
+}
 .login-box .user-box label {
 position: absolute;
 top:0;
@@ -184,21 +197,23 @@ bottom: 100%;
   <form action="/" method="POST">
 
     <div class="user-box">
-    <input type="number" id="instructor_id" name="instructor_id"><br>
+    <input type="number" id="instructor_id" name="instructor_id" min="1" step="1" required><br>
     <label for="instructor_id">Instructor ID:</label>
   </div>
 
     <div class="user-box">
-    <input type="text" id="instructor_name" name="instructor_name"><br>
+    <input type="text" id="instructor_name" name="instructor_name" maxlength="255"><br>
     <label for="instructor_name">Instructor Name:</label>
   </div>
 
     <div class="user-box">
-    <input type="number" id="department_id" name="department_id"><br>
-    <label for="department_id">Department ID:</label>
+    <select id="department_id" name="department_id" disabled>
+      <option value="">Loading departments...</option>
+    </select>
+    <!-- <label for="department_id">Department:</label> -->
   </div>
     
-    <button class="but1" type="submit" name="action" value="add">Add
+    <button id="add-instructor" class="but1" type="submit" name="action" value="add" disabled>Add
       <span></span>
       <span></span>
       <span></span>
@@ -212,12 +227,84 @@ bottom: 100%;
     </button>
   </form>
 
+  <p id="form-message" role="status" aria-live="polite" style="color: white; text-align: center;"></p>
 </div>
 
   <script>
-    function confirmDelete() {
-      return confirm("Are you sure you want to delete this instructor?");
-    }
+    const form = document.querySelector('form');
+    const departmentSelect = document.querySelector('#department_id');
+    const instructorName = document.querySelector('#instructor_name');
+    const addButton = document.querySelector('#add-instructor');
+    const message = document.querySelector('#form-message');
+    const apiBase = window.location.protocol === 'file:' ? 'http://localhost:5000' : '';
+
+    fetch(`${apiBase}/departments`)
+      .then(async response => {
+        if (!response.ok) {
+          throw new Error(await response.text());
+        }
+        return response.json();
+      })
+      .then(departments => {
+        departmentSelect.replaceChildren(new Option('--Select Department--', ''));
+        for (const department of departments) {
+          departmentSelect.add(new Option(
+            `${department.department_name} (ID: ${department.department_id})`,
+            department.department_id
+          ));
+        }
+        departmentSelect.disabled = departments.length === 0;
+        addButton.disabled = departments.length === 0;
+        if (departments.length === 0) {
+          departmentSelect.replaceChildren(new Option('No departments available', ''));
+        }
+      })
+      .catch(error => {
+        console.error('Could not load departments:', error);
+        departmentSelect.replaceChildren(new Option('Could not load departments', ''));
+        message.textContent = 'Departments could not be loaded. Adding instructors is unavailable.';
+      });
+
+    form.addEventListener('click', event => {
+      const button = event.target.closest('button');
+      const action = button ? button.value : '';
+      if (action === 'add') {
+        instructorName.required = true;
+        departmentSelect.required = true;
+      } else if (action === 'delete') {
+        instructorName.required = false;
+        departmentSelect.required = false;
+      }
+    });
+
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      message.textContent = '';
+      const formData = new FormData(form);
+      if (event.submitter && event.submitter.name) {
+        formData.set(event.submitter.name, event.submitter.value);
+      }
+      try {
+        const response = await fetch(`${apiBase}/`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams(formData)
+        });
+        const result = await response.text();
+        if (!response.ok) {
+          throw new Error(result);
+        }
+        message.textContent = result || 'Request completed successfully.';
+        message.style.color = '#03e9f4';
+        if (formData.get('action') === 'add') {
+          form.reset();
+          departmentSelect.selectedIndex = 0;
+        }
+      } catch (error) {
+        message.textContent = error.message || 'Request failed. Please try again.';
+        message.style.color = '#ff8080';
+      }
+    });
   </script>
 </body>
 </html>

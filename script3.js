@@ -27,6 +27,20 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'instructor.html'));
   });
 
+app.get('/departments', (req, res) => {
+  connection.query(
+    'SELECT department_id, department_name FROM department ORDER BY department_name',
+    (err, departments) => {
+      if (err) {
+        console.error('Could not load departments:', err.message);
+        res.status(500).send('Could not load departments.');
+        return;
+      }
+      res.json(departments);
+    }
+  );
+});
+
 // Route for handling form submissions
 app.post('/', (req, res) => {
   const { instructor_id, instructor_name, department_id, action } = req.body;
@@ -37,7 +51,8 @@ app.post('/', (req, res) => {
     const instructorName = typeof instructor_name === 'string' ? instructor_name.trim() : '';
 
     if (!Number.isInteger(instructorId) || instructorId <= 0 ||
-        !Number.isInteger(departmentId) || departmentId <= 0 || !instructorName) {
+        !Number.isInteger(departmentId) || departmentId <= 0 ||
+        !instructorName || instructorName.length > 255) {
       res.status(400).send('Enter a valid instructor ID, instructor name, and department ID.');
       return;
     }
@@ -49,14 +64,24 @@ app.post('/', (req, res) => {
           res.status(400).send(`Department ID ${departmentId} does not exist.`);
           return;
         }
+        if (err.code === 'ER_DUP_ENTRY') {
+          res.status(409).send(`Instructor ID ${instructorId} already exists.`);
+          return;
+        }
         console.error('Could not add instructor:', err.message);
         res.status(500).send('Could not add instructor.');
         return;
       }
       console.log('New instructor added to the database');
-      res.redirect('/');
+      res.send('Instructor added successfully.');
     });
   } else if (action === 'delete') {
+    const instructorId = Number(instructor_id);
+    if (!Number.isInteger(instructorId) || instructorId <= 0) {
+      res.status(400).send('Enter a valid instructor ID to delete.');
+      return;
+    }
+
     // Check if there are at least 2 instructors in the database
     const sql = 'SELECT COUNT(*) as num_instructors FROM instructor';
     connection.query(sql, (err, result) => {
@@ -74,14 +99,14 @@ app.post('/', (req, res) => {
       } else {
         // Delete instructor from the database
         const sql = 'DELETE FROM instructor WHERE instructor_id = ?';
-        connection.query(sql, [instructor_id], (err) => {
+        connection.query(sql, [instructorId], (err) => {
           if (err) {
             console.error('Could not delete instructor:', err.message);
             res.status(500).send('Could not delete instructor.');
             return;
           }
-          console.log(`Instructor ${instructor_id} deleted from the database`);
-          res.redirect('/');
+          console.log(`Instructor ${instructorId} deleted from the database`);
+          res.send('Instructor deleted successfully.');
         });
       }
     });
