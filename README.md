@@ -72,8 +72,8 @@ The system should support multiple departments and courses, allow instructors to
 
 ### 3. Search Student Records
 
-- The administrator can search for students by name.
-- The administrator can search or filter students by year of admission.
+- The administrator can filter student records using department, instructor, course, student, and academic-year dropdowns populated from the database.
+- The administrator can combine filters or leave them set to “All” to broaden the results.
 - Search results display matching student details in a readable format.
 
 ### 4. Manage Academic Information

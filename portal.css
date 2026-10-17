@@ -538,24 +538,24 @@ body:has(> .portal-topbar) .login-box {
   width: min(100%, 760px);
 }
 
-.login-box:has(#department_id) form {
+.login-box:has(#department_id):not(:has(#search_button)) form {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   column-gap: 22px;
 }
 
-.login-box:has(#department_id) > h2,
-.login-box:has(#department_id) form::before,
-.login-box:has(#department_id) .user-box:has(select),
-.login-box:has(#department_id) #form-message {
+.login-box:has(#department_id):not(:has(#search_button)) > h2,
+.login-box:has(#department_id):not(:has(#search_button)) form::before,
+.login-box:has(#department_id):not(:has(#search_button)) .user-box:has(select),
+.login-box:has(#department_id):not(:has(#search_button)) #form-message {
   grid-column: 1 / -1;
 }
 
-.login-box:has(#department_id) .user-box {
+.login-box:has(#department_id):not(:has(#search_button)) .user-box {
   margin-bottom: 16px;
 }
 
-.login-box:has(#department_id) form button[name="action"] {
+.login-box:has(#department_id):not(:has(#search_button)) form button[name="action"] {
   width: 100%;
 }
 
@@ -563,6 +563,11 @@ body:has(> .portal-topbar) .login-box {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   column-gap: 22px;
+}
+
+.login-box:has(#search_button) .search-actions,
+.login-box:has(#search_button) #search-message {
+  grid-column: 1 / -1;
 }
 
 .login-box:has(#search_button) form::before,
@@ -583,6 +588,57 @@ body:has(> .portal-topbar) .login-box {
   justify-self: end;
   width: min(100%, 220px);
   margin-top: 4px;
+}
+
+.search-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.login-box form #clear_button {
+  width: auto;
+  min-width: 130px;
+  color: #cbd5e1;
+  background: rgba(255, 255, 255, 0.045);
+  border-color: rgba(203, 213, 225, 0.24);
+}
+
+.login-box form #clear_button:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(203, 213, 225, 0.42);
+}
+
+.login-box #search-message {
+  margin: 0;
+  color: #ff9b9b;
+  font-size: 13px;
+  text-align: left;
+}
+
+.login-box #search-message:empty {
+  display: none;
+}
+
+.results-wrap #result-summary {
+  margin: 0;
+  padding: 18px 4px 0;
+  color: #cbd5e1;
+  font-size: 13px;
+}
+
+.results-wrap #result-summary[data-state="empty"] {
+  color: #f2d18a;
+}
+
+.results-wrap #result-summary:empty {
+  display: none;
+}
+
+.results-wrap #result_table[hidden] {
+  display: none;
 }
 
 .results-wrap {
@@ -674,7 +730,7 @@ body:has(> .portal-topbar) .login-box {
   }
 
   .login-box:has(#course_id) form,
-  .login-box:has(#department_id) form {
+  .login-box:has(#department_id):not(:has(#search_button)) form {
     grid-template-columns: minmax(0, 1fr);
   }
 
@@ -683,10 +739,10 @@ body:has(> .portal-topbar) .login-box {
   .login-box:has(#course_id) form > label[for="course_id"],
   .login-box:has(#course_id) form > #course_id,
   .login-box:has(#course_id) form > input[type="submit"],
-  .login-box:has(#department_id) > h2,
-  .login-box:has(#department_id) form::before,
-  .login-box:has(#department_id) .user-box:has(select),
-  .login-box:has(#department_id) #form-message {
+  .login-box:has(#department_id):not(:has(#search_button)) > h2,
+  .login-box:has(#department_id):not(:has(#search_button)) form::before,
+  .login-box:has(#department_id):not(:has(#search_button)) .user-box:has(select),
+  .login-box:has(#department_id):not(:has(#search_button)) #form-message {
     grid-column: auto;
   }
 
@@ -697,6 +753,14 @@ body:has(> .portal-topbar) .login-box {
   }
 
   .login-box:has(#search_button) #search_button {
+    width: 100%;
+  }
+
+  .search-actions {
+    flex-direction: column-reverse;
+  }
+
+  .login-box form #clear_button {
     width: 100%;
   }
 

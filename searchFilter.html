@@ -4,7 +4,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Search Filter</title>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <style>
     html {
       height: 100%;
@@ -254,56 +253,53 @@
   </nav>
   <div class="login-box">
     <h2>Search Filter</h2>
-    <form>
+    <p class="form-help">Choose from your existing departments, courses, students and instructors. Leave a filter on “All” to include every option.</p>
+    <form id="search-form">
       <div class="user-box">
-        <input type="text" id="department_id" name="department_id"><br>
-        <label for="department_id">Department ID:</label>
+        <label for="department_id">Department</label>
+        <select id="department_id" name="department_id" disabled>
+          <option value="">Loading departments...</option>
+        </select>
       </div>
 
       <div class="user-box">
-        <input type="text" id="instructor_id" name="instructor_id"><br>
-        <label for="instructor_id">Instructor ID:</label>
+        <label for="instructor_id">Instructor</label>
+        <select id="instructor_id" name="instructor_id" disabled>
+          <option value="">Loading instructors...</option>
+        </select>
       </div>
 
       <div class="user-box">
-        <input type="text" id="course_id" name="course_id"><br>
-        <label for="course_id">Course ID:</label>
+        <label for="course_id">Course</label>
+        <select id="course_id" name="course_id" disabled>
+          <option value="">Loading courses...</option>
+        </select>
       </div>
 
       <div class="user-box">
-        <input type="text" id="course_name" name="course_name"><br>
-        <label for="course_name">Course Name:</label>
+        <label for="student_id">Student</label>
+        <select id="student_id" name="student_id" disabled>
+          <option value="">Loading students...</option>
+        </select>
       </div>
 
       <div class="user-box">
-        <input type="text" id="student_id" name="student_id"><br>
-        <label for="student_id">Student ID:</label>
+        <label for="year">Academic year</label>
+        <select id="year" name="year" disabled>
+          <option value="">Loading years...</option>
+        </select>
       </div>
 
-      <div class="user-box">
-        <input type="text" id="student_name" name="student_name"><br>
-        <label for="student_name">Student Name:</label>
+      <div class="search-actions">
+        <button class="but1" type="reset" id="clear_button">Clear filters</button>
+        <button class="but1" type="submit" id="search_button" disabled>Search records</button>
       </div>
-
-      <div class="user-box">
-        <input type="number" id="Year" name="year"><br>
-        <label for="year">Year:</label>
-      </div>
-
-
-
-      <button class="but1" type="submit" id="search_button">
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        Search</button>
-
-
+      <p id="search-message" role="status" aria-live="polite"></p>
     </form>
   </div>
   <div class="results-wrap">
-  <table id="result_table" style="display:none;">
+  <p id="result-summary" role="status" aria-live="polite"></p>
+  <table id="result_table" hidden>
     <thead>
       <tr>
         <th>Student ID</th>
@@ -323,41 +319,105 @@
     <tbody></tbody>
   </table>
   </div>
-  </div>
 
   <script>
-    $(function () {
-      $('form').submit(function (event) {
-        event.preventDefault();
-        var formData = $('form').serialize();
-        $.ajax({
-          type: 'GET',
-          url: '/search?' + formData,
-          success: function (result) {
-            $('#result_table tbody').empty();
-            $.each(result, function (index, row) {
-              var tr = $('<tr>');
-              tr.append('<td>' + row.student_id + '</td>');
-              tr.append('<td>' + row.student_name + '</td>');
-              tr.append('<td>' + row.year + '</td>');
-              tr.append('<td>' + row.age + '</td>');
-              tr.append('<td>' + row.address + '</td>');
-              tr.append('<td>' + row.course_id + '</td>');
-              tr.append('<td>' + row.course_name + '</td>');
-              tr.append('<td>' + row.course_duration + '</td>');
-              tr.append('<td>' + row.instructor_id + '</td>');
-              tr.append('<td>' + row.instructor_name + '</td>');
-              tr.append('<td>' + row.department_id + '</td>');
-              tr.append('<td>' + row.department_name + '</td>');
-              $('#result_table tbody').append(tr);
-            });
-            $('#result_table').show();
-          },
-          error: function () {
-            alert('An error occurred while processing your request.');
-          }
-        });
+    const form = document.querySelector('#search-form');
+    const searchButton = document.querySelector('#search_button');
+    const message = document.querySelector('#search-message');
+    const summary = document.querySelector('#result-summary');
+    const table = document.querySelector('#result_table');
+    const tableBody = table.querySelector('tbody');
+    const filterSelects = {
+      department_id: document.querySelector('#department_id'),
+      instructor_id: document.querySelector('#instructor_id'),
+      course_id: document.querySelector('#course_id'),
+      student_id: document.querySelector('#student_id'),
+      year: document.querySelector('#year')
+    };
+
+    function populateSelect(select, entries, allLabel, getLabel) {
+      select.replaceChildren(new Option(allLabel, ''));
+      for (const entry of entries) {
+        select.add(new Option(getLabel(entry), entry.id ?? entry));
+      }
+      select.disabled = false;
+    }
+
+    fetch('/filters')
+      .then(async response => {
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Could not load search options.');
+        return data;
+      })
+      .then(data => {
+        populateSelect(filterSelects.department_id, data.departments, 'All departments',
+          item => `${item.name} (ID: ${item.id})`);
+        populateSelect(filterSelects.instructor_id, data.instructors, 'All instructors',
+          item => `${item.name || 'Unnamed instructor'} (ID: ${item.id})`);
+        populateSelect(filterSelects.course_id, data.courses, 'All courses',
+          item => `${item.name} — ${item.department} (ID: ${item.id})`);
+        populateSelect(filterSelects.student_id, data.students, 'All students',
+          item => `${item.name || 'Unnamed student'} (ID: ${item.id})`);
+        populateSelect(filterSelects.year, data.years, 'All years', year => year);
+        searchButton.disabled = false;
+      })
+      .catch(error => {
+        console.error('Could not load search filters:', error);
+        message.textContent = error.message || 'Could not load search options. Please refresh and try again.';
+        message.dataset.state = 'error';
       });
+
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      message.textContent = '';
+      summary.textContent = '';
+      searchButton.disabled = true;
+      searchButton.textContent = 'Searching...';
+      const query = new URLSearchParams();
+      for (const [key, value] of new FormData(form).entries()) {
+        if (value) query.append(key, value);
+      }
+
+      try {
+        const response = await fetch(`/search?${query}`);
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || 'Search failed.');
+
+        tableBody.replaceChildren();
+        for (const row of result) {
+          const tr = document.createElement('tr');
+          for (const value of [
+            row.student_id, row.student_name, row.year, row.age, row.address,
+            row.course_id, row.course_name, row.course_duration,
+            row.instructor_id, row.instructor_name, row.department_id, row.department_name
+          ]) {
+            const td = document.createElement('td');
+            td.textContent = value ?? '';
+            tr.append(td);
+          }
+          tableBody.append(tr);
+        }
+
+        table.hidden = result.length === 0;
+        summary.textContent = result.length
+          ? `${result.length} ${result.length === 1 ? 'record' : 'records'} found`
+          : 'No matching student records found. Try changing or clearing a filter.';
+        summary.dataset.state = result.length ? 'success' : 'empty';
+      } catch (error) {
+        message.textContent = error.message || 'Search failed. Please try again.';
+        message.dataset.state = 'error';
+        table.hidden = true;
+      } finally {
+        searchButton.disabled = false;
+        searchButton.textContent = 'Search records';
+      }
+    });
+
+    form.addEventListener('reset', () => {
+      message.textContent = '';
+      summary.textContent = '';
+      table.hidden = true;
+      tableBody.replaceChildren();
     });
   </script>
 </body>

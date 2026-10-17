@@ -33,18 +33,58 @@ app.get('/portal.css', (req, res) => {
 });
 
 app.use(express.static('DBMS PROJECT'));
-// Route to handle search filter request
-app.get('/search', (req, res) => {
-    const department_id = req.query.department_id;
-    const instructor_id = req.query.instructor_id;
-    const course_id = req.query.course_id;
-    const course_name = req.query.course_name;
-    const student_id = req.query.student_id;
-    const student_name = req.query.student_name;
-    const year = req.query.year;
 
-    // Construct the SQL query based on the search filter
-    let sql = 'SELECT s.student_id, s.student_name, s.year, s.age, s.address, ' +
+app.get('/filters', async (req, res) => {
+    try {
+        const database = connection.promise();
+        const [departments] = await database.query(
+            'SELECT department_id AS id, department_name AS name FROM department ORDER BY department_name'
+        );
+        const [instructors] = await database.query(
+            'SELECT instructor_id AS id, instructor_name AS name FROM instructor ORDER BY instructor_name, instructor_id'
+        );
+        const [courses] = await database.query(
+            'SELECT c.course_id AS id, c.course_name AS name, d.department_name AS department ' +
+            'FROM courses c JOIN department d ON d.department_id = c.department_id ' +
+            'ORDER BY c.course_name, c.course_id'
+        );
+        const [students] = await database.query(
+            'SELECT DISTINCT student_id AS id, student_name AS name FROM student ' +
+            'ORDER BY student_name, student_id'
+        );
+        const [years] = await database.query(
+            'SELECT DISTINCT year FROM student WHERE year IS NOT NULL ORDER BY year DESC'
+        );
+        res.json({ departments, instructors, courses, students, years: years.map(row => row.year) });
+    } catch (err) {
+        console.error('Could not load search filters:', err.message);
+        res.status(500).json({ message: 'Could not load search options. Please try again.' });
+    }
+});
+
+app.get('/search', (req, res) => {
+    const filters = {
+        department_id: 'd.department_id',
+        instructor_id: 'i.instructor_id',
+        course_id: 'c.course_id',
+        student_id: 's.student_id',
+        year: 's.year'
+    };
+    const conditions = [];
+    const values = [];
+    for (const [name, column] of Object.entries(filters)) {
+        const value = req.query[name];
+        if (typeof value === 'string' && value !== '') {
+            if (!/^\d+$/.test(value)) {
+                res.status(400).json({ message: `Invalid ${name.replace('_', ' ')} filter.` });
+                return;
+            }
+            conditions.push(`${column} = ?`);
+            values.push(Number(value));
+        }
+    }
+
+    const sql = 'SELECT s.student_id, s.student_name, s.year, s.age, s.address, ' +
         'c.course_id, c.course_name, c.course_duration, ' +
         'i.instructor_id, i.instructor_name, ' +
         'd.department_id, d.department_name ' +
@@ -52,39 +92,15 @@ app.get('/search', (req, res) => {
         'JOIN courses c ON s.course_id = c.course_id ' +
         'JOIN instructor i ON c.instructor_id = i.instructor_id ' +
         'JOIN department d ON c.department_id = d.department_id ' +
-        'WHERE 1 = 1 ';
+        (conditions.length ? `WHERE ${conditions.join(' AND ')}` : '') +
+        ' ORDER BY s.student_name, c.course_name';
 
-    if (department_id) {
-        sql += `AND d.department_id = ${department_id} `;
-    }
-
-    if (instructor_id) {
-        sql += `AND i.instructor_id = ${instructor_id} `;
-    }
-
-    if (course_id) {
-        sql += `AND c.course_id = ${course_id} `;
-    }
-
-    if (course_name) {
-        sql += `AND c.course_name LIKE '%${course_name}%' `;
-    }
-
-    if (student_id) {
-        sql += `AND s.student_id = ${student_id} `;
-    }
-
-    if (student_name) {
-        sql += `AND s.student_name LIKE '%${student_name}%' `;
-    }
-
-    if (year) {
-        sql += `AND s.year = ${year} `;
-    }
-
-    // Execute the SQL query
-    connection.query(sql, (err, result) => {
-        if (err) throw err;
+    connection.query(sql, values, (err, result) => {
+        if (err) {
+            console.error('Could not search college records:', err.message);
+            res.status(500).json({ message: 'Could not search records. Please try again.' });
+            return;
+        }
         res.json(result);
     });
 });
