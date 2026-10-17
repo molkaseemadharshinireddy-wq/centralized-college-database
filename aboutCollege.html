@@ -7,8 +7,6 @@
     <title>About College</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <link rel="stylesheet" href="portal.css">
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="node_modules/animejs/lib/anime.min.js"></script>
 </head>
 
 <body>
@@ -27,11 +25,25 @@
         <a class="portal-home-link" href="http://localhost:3000/index.html">Workspace <span aria-hidden="true">↗</span></a>
     </nav>
 
-    <header class="department-heading">
-        <h1>College-Department Structure</h1>
-        <p>Explore how academic departments connect to their courses.</p>
-    </header>
-    <div id="tree-container"></div>
+    <main class="department-page">
+        <header class="department-heading">
+            <p class="eyebrow">ACADEMIC DIRECTORY</p>
+            <h1>College-Department Structure</h1>
+            <p>Explore each department and the courses it offers.</p>
+        </header>
+        <section class="department-panel" aria-label="Department tree">
+            <div class="tree-toolbar">
+                <p id="tree-summary" class="tree-summary" aria-live="polite">Loading departments…</p>
+                <button id="tree-toggle" class="tree-toggle" type="button" hidden>Collapse all</button>
+            </div>
+            <div id="tree-container" aria-live="polite">
+                <p class="tree-message">Loading the college structure…</p>
+            </div>
+        </section>
+        <noscript>
+            <p class="tree-message tree-error">Enable JavaScript to view the department structure.</p>
+        </noscript>
+    </main>
     <script src="tree.js"></script>
 
 </body>

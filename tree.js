@@ -1,67 +1,152 @@
-// Load the JSON data
-d3.json("departments.json").then(function (data) {
+const treeContainer = document.querySelector('#tree-container');
+const treeSummary = document.querySelector('#tree-summary');
+const treeToggle = document.querySelector('#tree-toggle');
 
-    // Set the dimensions and margins of the diagram
-    var margin = { top: 20, right: 90, bottom: 30, left: 90 };
-    var width = 960 - margin.left - margin.right;
-    var height = 500 - margin.top - margin.bottom;
+function createTreeNode(name, className, detail) {
+    const summary = document.createElement('summary');
+    summary.className = `tree-node ${className}`;
 
-    // Append the SVG object to the tree container
-    var svg = d3.select("#tree-container")
-        .append("svg")
-        .attr("width", width + margin.right + margin.left)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform",
-            "translate(" + margin.left + "," + margin.top + ")");
+    const label = document.createElement('span');
+    label.className = 'tree-node-name';
+    label.textContent = name;
+    summary.append(label);
 
-    // Create a hierarchical structure with the data
-    var root = d3.hierarchy(data);
+    if (detail) {
+        const badge = document.createElement('span');
+        badge.className = 'tree-badge';
+        badge.textContent = detail;
+        summary.append(badge);
+    }
 
-    // Set the tree layout
-    var treeLayout = d3.tree()
-        .size([height, width]);
+    return summary;
+}
 
-    // Assign positions to the nodes
-    treeLayout(root);
+function renderTree(data) {
+    if (!data || typeof data.name !== 'string' || !Array.isArray(data.children)) {
+        throw new Error('The department data has an invalid structure.');
+    }
 
-    // Add links between the nodes
-    svg.selectAll(".link")
-        .data(root.links())
-        .enter()
-        .append("path")
-        .attr("class", "link")
-        .attr("d", d3.linkHorizontal()
-            .x(function (d) { return d.y; })
-            .y(function (d) { return d.x; }));
+    const departmentCount = data.children.length;
+    const courseCount = data.children.reduce((total, department) => {
+        if (!department || typeof department.name !== 'string' || !Array.isArray(department.children)) {
+            throw new Error('A department is missing its name or course list.');
+        }
+        return total + department.children.length;
+    }, 0);
 
-    // Add nodes to the tree
-    var node = svg.selectAll(".node")
-        .data(root.descendants())
-        .enter()
-        .append("g")
-        .attr("class", function (d) {
-            return "node" +
-                (d.children ? " node--internal" : " node--leaf");
-        })
-        .attr("transform", function (d) {
-            return "translate(" + d.y + "," + d.x + ")";
+    const tree = document.createElement('ul');
+    tree.className = 'tree-list tree-root-list';
+
+    const rootItem = document.createElement('li');
+    rootItem.className = 'tree-item tree-root-item';
+    const rootBranch = document.createElement('details');
+    rootBranch.className = 'tree-branch tree-root-branch';
+    rootBranch.open = true;
+    rootBranch.append(createTreeNode(data.name, 'tree-node--college', `${departmentCount} departments`));
+
+    const departmentList = document.createElement('ul');
+    departmentList.className = 'tree-list tree-children';
+
+    data.children.forEach((department) => {
+        const departmentItem = document.createElement('li');
+        departmentItem.className = 'tree-item';
+        const departmentBranch = document.createElement('details');
+        departmentBranch.className = 'tree-branch tree-department-branch';
+        departmentBranch.open = true;
+        departmentBranch.append(
+            createTreeNode(
+                department.name,
+                'tree-node--department',
+                `${department.children.length} ${department.children.length === 1 ? 'course' : 'courses'}`
+            )
+        );
+
+        const courseList = document.createElement('ul');
+        courseList.className = 'tree-list tree-courses';
+
+        department.children.forEach((course) => {
+            if (!course || typeof course.name !== 'string') {
+                throw new Error(`A course in ${department.name} is missing its name.`);
+            }
+
+            const courseItem = document.createElement('li');
+            courseItem.className = 'tree-item tree-course-item';
+            const courseNode = document.createElement('div');
+            courseNode.className = 'tree-node tree-node--course';
+
+            const courseName = document.createElement('span');
+            courseName.className = 'tree-node-name';
+            courseName.textContent = course.name;
+            courseNode.append(courseName);
+
+            if (typeof course.duration === 'string' && course.duration.trim()) {
+                const duration = document.createElement('span');
+                duration.className = 'tree-badge tree-duration';
+                duration.textContent = course.duration;
+                courseNode.append(duration);
+            }
+
+            courseItem.append(courseNode);
+            courseList.append(courseItem);
         });
 
-    // Add circles to the nodes
-    node.append("circle")
-        .attr("r", 10)
-        .attr("id", function(d) { return d.data.name.replace(/\s+/g, '-').toLowerCase(); });
+        departmentBranch.append(courseList);
+        departmentItem.append(departmentBranch);
+        departmentList.append(departmentItem);
+    });
 
-    // Add labels to the nodes
-    node.append("text")
-        .attr("dy", ".35em")
-        .attr("x", function (d) { return d.children ? -13 : 13; })
-        .style("text-anchor", function (d) {
-            return d.children ? "end" : "start";
-        })
-        .text(function (d) { return d.data.name; });
+    rootBranch.append(departmentList);
+    rootItem.append(rootBranch);
+    tree.append(rootItem);
+    treeContainer.replaceChildren(tree);
+    treeSummary.textContent = `${departmentCount} departments · ${courseCount} courses`;
+    treeToggle.hidden = false;
+    treeToggle.textContent = 'Collapse all';
+}
 
+function showError(error) {
+    console.error('Could not load the department tree:', error);
+    treeSummary.textContent = 'Department structure unavailable';
+
+    const message = document.createElement('p');
+    message.className = 'tree-message tree-error';
+    message.textContent = 'The department structure could not be loaded. Check your connection and try again.';
+
+    const retry = document.createElement('button');
+    retry.className = 'tree-toggle';
+    retry.type = 'button';
+    retry.textContent = 'Try again';
+    retry.addEventListener('click', loadTree, { once: true });
+
+    treeContainer.replaceChildren(message, retry);
+    treeToggle.hidden = true;
+}
+
+async function loadTree() {
+    treeSummary.textContent = 'Loading departments…';
+    treeContainer.replaceChildren(Object.assign(document.createElement('p'), {
+        className: 'tree-message',
+        textContent: 'Loading the college structure…'
+    }));
+
+    try {
+        const response = await fetch('departments.json');
+        if (!response.ok) {
+            throw new Error(`Department data request failed (${response.status}).`);
+        }
+        renderTree(await response.json());
+    } catch (error) {
+        showError(error);
+    }
+}
+
+treeToggle.addEventListener('click', () => {
+    const branches = treeContainer.querySelectorAll('details.tree-branch');
+    const shouldExpand = Array.from(branches).some((branch) => !branch.open);
+    branches.forEach((branch) => {
+        branch.open = shouldExpand;
+    });
+    treeToggle.textContent = shouldExpand ? 'Collapse all' : 'Expand all';
 });
 
-  
+loadTree();

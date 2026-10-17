@@ -14,11 +14,19 @@ body {
     #070719;
 }
 
-header {
+body:has(> .portal-topbar) {
+  justify-content: flex-start;
+}
+
+.department-page {
+  width: min(100%, 1120px);
+  margin: 0 auto 32px;
+}
+
+.department-heading {
   position: relative;
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 28px clamp(24px, 5vw, 52px);
+  margin: 0;
+  padding: 30px clamp(22px, 5vw, 48px);
   color: #fff;
   background:
     radial-gradient(ellipse at 100% 0, rgba(3, 233, 244, 0.1), transparent 24rem),
@@ -28,45 +36,20 @@ header {
   box-shadow: 0 14px 35px rgba(0, 0, 31, 0.18);
 }
 
-header.department-heading {
-  width: min(100%, 1120px);
-  margin-top: 0;
-  border-radius: 18px 18px 0 0;
-}
-
-header.department-heading::before,
-header.department-heading::after {
+.department-heading::before,
+.department-heading::after {
   display: none;
 }
 
-header.department-heading p {
-  margin: 10px 0 0;
-  color: #cbd5e1;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-header::after {
-  position: absolute;
-  top: 0;
-  right: 10%;
-  left: 10%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #03e9f4, transparent);
-  content: "";
-}
-
-header::before {
-  display: block;
-  margin-bottom: 10px;
+.department-heading .eyebrow {
+  margin: 0 0 10px;
   color: #03e9f4;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.2em;
-  content: "CENTRALIZED COLLEGE DATABASE";
 }
 
-h1 {
+.department-heading h1 {
   margin: 0;
   color: #fff;
   font-size: clamp(24px, 4vw, 36px);
@@ -74,14 +57,15 @@ h1 {
   letter-spacing: -0.03em;
 }
 
-#tree-container {
-  display: flex;
-  width: min(100%, 1120px);
-  min-height: 560px;
-  align-items: center;
-  margin: 0 auto;
-  padding: 24px;
-  overflow-x: auto;
+.department-heading > p:last-child {
+  margin: 10px 0 0;
+  color: #cbd5e1;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.department-panel {
+  padding: 18px clamp(16px, 4vw, 38px) 34px;
   background:
     radial-gradient(ellipse at 100% 0, rgba(3, 233, 244, 0.08), transparent 25rem),
     linear-gradient(145deg, #080823, #00001f 70%);
@@ -91,32 +75,208 @@ h1 {
   box-shadow: 0 14px 35px rgba(0, 0, 31, 0.18);
 }
 
-.node {
-  cursor: pointer;
+.tree-toolbar {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(203, 213, 225, 0.14);
 }
 
-.node circle {
-  fill: #10142f;
-  stroke: #03e9f4;
-  stroke-width: 2px;
-}
-
-.node text {
-  fill: #e2e8f0;
+.tree-summary {
+  margin: 0;
+  color: #94a3b8;
   font-size: 13px;
   font-weight: 600;
 }
 
-.link {
-  fill: none;
-  stroke: #03e9f4;
-  stroke-width: 2px;
+.tree-toggle {
+  min-height: 36px;
+  padding: 7px 12px;
+  color: #03e9f4;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  background: rgba(3, 233, 244, 0.08);
+  border: 1px solid rgba(3, 233, 244, 0.28);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease;
 }
 
-svg {
-  width: 100%;
-  min-width: 760px;
-  height: 100%;
+.tree-toggle:hover {
+  background: rgba(3, 233, 244, 0.15);
+  border-color: rgba(3, 233, 244, 0.55);
+}
+
+.tree-toggle:focus-visible,
+.tree-branch > summary:focus-visible {
+  outline: 2px solid #03e9f4;
+  outline-offset: 3px;
+}
+
+#tree-container {
+  min-height: 320px;
+  overflow-x: auto;
+}
+
+.tree-list {
+  margin: 0;
+  padding: 0 0 0 28px;
+  list-style: none;
+  border-left: 1px solid rgba(3, 233, 244, 0.32);
+}
+
+.tree-root-list {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.tree-item {
+  position: relative;
+  padding: 12px 0 0 25px;
+}
+
+.tree-root-item {
+  padding-left: 0;
+}
+
+.tree-children {
+  margin: 7px 0 0 18px;
+}
+
+.tree-courses {
+  margin: 7px 0 0 16px;
+  padding-left: 20px;
+  border-color: rgba(148, 163, 184, 0.3);
+}
+
+.tree-item::before {
+  position: absolute;
+  top: 31px;
+  left: -1px;
+  width: 26px;
+  border-top: 1px solid rgba(3, 233, 244, 0.32);
+  content: "";
+}
+
+.tree-root-item::before {
+  display: none;
+}
+
+.tree-branch > summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.tree-branch > summary::-webkit-details-marker {
+  display: none;
+}
+
+.tree-node {
+  display: flex;
+  width: fit-content;
+  max-width: min(680px, 100%);
+  min-height: 42px;
+  align-items: center;
+  gap: 14px;
+  padding: 9px 14px;
+  color: #e2e8f0;
+  background: rgba(15, 23, 42, 0.82);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 10px;
+}
+
+.tree-node::before {
+  display: inline-grid;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  place-items: center;
+  color: #03e9f4;
+  font-size: 16px;
+  font-weight: 700;
+  content: "+";
+  background: rgba(3, 233, 244, 0.1);
+  border-radius: 6px;
+}
+
+.tree-branch[open] > summary::before {
+  content: "-";
+}
+
+.tree-node-name {
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.tree-node--college {
+  min-height: 50px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 750;
+  background: rgba(3, 233, 244, 0.11);
+  border-color: rgba(3, 233, 244, 0.5);
+  box-shadow: 0 0 24px rgba(3, 233, 244, 0.07);
+}
+
+.tree-node--department {
+  font-size: 14px;
+  font-weight: 700;
+  border-color: rgba(3, 233, 244, 0.24);
+}
+
+.tree-node--course {
+  display: inline-flex;
+  min-height: 38px;
+  padding: 7px 12px;
+  font-size: 13px;
+  background: rgba(255, 255, 255, 0.035);
+  border-color: rgba(148, 163, 184, 0.14);
+}
+
+.tree-node--course::before {
+  width: 8px;
+  height: 8px;
+  content: "";
+  background: #03e9f4;
+  border-radius: 50%;
+}
+
+.tree-badge {
+  flex: 0 0 auto;
+  padding: 4px 8px;
+  color: #a5f3fc;
+  font-size: 11px;
+  font-weight: 650;
+  white-space: nowrap;
+  background: rgba(3, 233, 244, 0.09);
+  border: 1px solid rgba(3, 233, 244, 0.15);
+  border-radius: 999px;
+}
+
+.tree-duration {
+  color: #94a3b8;
+  background: rgba(148, 163, 184, 0.08);
+  border-color: rgba(148, 163, 184, 0.14);
+}
+
+.tree-message {
+  margin: 12px 0;
+  padding: 16px;
+  color: #cbd5e1;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 10px;
+}
+
+.tree-error {
+  color: #fecaca;
+  background: rgba(127, 29, 29, 0.18);
+  border-color: rgba(248, 113, 113, 0.3);
 }
 
 @media (max-width: 600px) {
@@ -124,8 +284,51 @@ svg {
     padding: 16px 12px;
   }
 
-  #tree-container {
-    min-height: 440px;
-    padding: 12px;
+  .department-page {
+    margin-bottom: 16px;
+  }
+
+  .department-heading {
+    padding: 24px 20px;
+  }
+
+  .department-panel {
+    padding: 14px 14px 24px;
+  }
+
+  .tree-list {
+    padding-left: 17px;
+  }
+
+  .tree-root-list {
+    padding-left: 0;
+  }
+
+  .tree-item {
+    padding-left: 15px;
+  }
+
+  .tree-children,
+  .tree-courses {
+    margin-left: 10px;
+  }
+
+  .tree-node {
+    gap: 8px;
+    padding: 8px 10px;
+  }
+
+  .tree-badge {
+    padding: 3px 6px;
+    font-size: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }

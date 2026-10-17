@@ -23,17 +23,20 @@ The **Centralized College Database** is a database management system project des
 
 ## Project Preview
 
-The following screenshots show the project interface. Keep the image files in the project folder, or update the paths below to match their actual locations.
-
 ### 1. Main Page
-![Main Page](screenshots/mainphoto.jpeg)
+![Main Page](screenshots/main_page.png)
 
-### 2. Search Database
-![Search Database](screenshots/seach%20database.jpeg)
+### 2. Login Portal
+![Login Portal](screenshots/login%20portal.png)
 
-### 3. Search Results
-![Search Results](screenshots/result%20of%20search.jpeg)
+### 3. Add Student Form
+![Add Student Form](screenshots/Add%20student.png)
 
+### 4. Add/Delete Instructor
+![Add/Delete Instructor](screenshots/add_delete_instructor.png)
+
+### 5. Search Database
+![Search Database](screenshots/search%20filter.png)
 ## Project Abstract
 
 Colleges have multiple academic departments, such as English, Mathematics, History, and Physics. Each department may offer several courses, and an instructor may be qualified to teach more than one course. Similarly, students may enroll in multiple courses.
