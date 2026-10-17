@@ -2,6 +2,8 @@
 <html>
 
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title> Add Student Form</title>
   <style>
     html {
@@ -193,9 +195,23 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="portal.css">
 </head>
 
 <body>
+  <nav class="portal-topbar" aria-label="Main navigation">
+    <a class="portal-brand" href="http://localhost:3000/index.html">
+      <span class="brand-mark">C</span>
+      <span class="brand-name">CCD <small>PORTAL</small></span>
+    </a>
+    <div class="portal-nav-links">
+      <a href="http://localhost:4000/">Search</a>
+      <a class="is-current" href="http://localhost:3000/">Students</a>
+      <a href="http://localhost:5000/">Instructors</a>
+      <a href="http://localhost:3000/aboutCollege.html">Departments</a>
+    </div>
+    <a class="portal-home-link" href="http://localhost:3000/index.html">Workspace <span aria-hidden="true">↗</span></a>
+  </nav>
   <div class="login-box">
     <h2>Add Student Form</h2>
     <form action="http://localhost:3000/submit" method="POST">

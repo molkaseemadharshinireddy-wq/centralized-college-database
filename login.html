@@ -2,15 +2,22 @@
 <html>
 
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login Page</title>
     <style>
         html {
-            height: 100%;
+            min-height: 100%;
         }
 
         body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
             margin: 0;
-            padding: 0;
+            padding: 24px 0;
+            box-sizing: border-box;
             font-family: sans-serif;
             background: white
         }
@@ -20,17 +27,31 @@
             border: none;
         }
 
+        #canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
         .login-box {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 400px;
+            position: relative;
+            z-index: 1;
+            width: min(400px, calc(100% - 32px));
             padding: 40px;
-            transform: translate(-50%, -50%);
+            margin: auto;
             background: rgba(0, 0, 31, 0.863);
             box-sizing: border-box;
             box-shadow: 0 15px 25px rgba(0, 0, 0, .6);
             border-radius: 10px;
+        }
+
+        @media (max-width: 480px) {
+            .login-box {
+                padding: 32px 24px;
+            }
         }
 
         .login-box h2 {
@@ -56,6 +77,59 @@
             background: transparent;
         }
 
+        .login-box .user-box input.password-input {
+            width: calc(100% - 44px);
+        }
+
+        .password-toggle {
+            position: absolute !important;
+            top: 0;
+            right: 0;
+            display: grid !important;
+            width: 36px;
+            height: 36px;
+            place-items: center;
+            margin: 0 !important;
+            padding: 8px !important;
+            color: #cbd5e1 !important;
+            background: transparent !important;
+            border: 0;
+            border-radius: 50%;
+            box-shadow: none !important;
+            cursor: pointer;
+            transition: color 160ms ease, background-color 160ms ease;
+        }
+
+        .login-box .user-box .password-toggle:hover {
+            color: #03e9f4 !important;
+            background: rgba(3, 233, 244, 0.12) !important;
+            box-shadow: none !important;
+        }
+
+        .password-toggle:focus-visible {
+            outline: 2px solid #03e9f4;
+            outline-offset: 2px;
+        }
+
+        .password-toggle svg {
+            display: block;
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-width: 1.8;
+        }
+
+        .password-toggle .eye-slash {
+            display: none;
+        }
+
+        .password-toggle[aria-pressed="true"] .eye-slash {
+            display: block;
+        }
+
         .login-box .user-box label {
             position: absolute;
             top: 0;
@@ -68,7 +142,9 @@
         }
 
         .login-box .user-box input:focus~label,
-        .login-box .user-box input:valid~label {
+        .login-box .user-box input:not(:placeholder-shown)~label,
+        .login-box .user-box input:-webkit-autofill~label,
+        .login-box .user-box input:autofill~label {
             top: -20px;
             left: 0;
             color: #03e9f4;
@@ -99,134 +175,238 @@
                 0 0 100px #03e9f4;
         }
 
-        .login-box button span {
-            position: absolute;
-            display: block;
-        }
-
-        .login-box button span:nth-child(1) {
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #03e9f4);
-            animation: btn-anim1 1s linear infinite;
-        }
-
-        @keyframes btn-anim1 {
-            0% {
-                left: -100%;
-            }
-
-            50%,
-            100% {
-                left: 100%;
-            }
-        }
-
-        .login-box button span:nth-child(2) {
-            top: -100%;
-            right: 0;
-            width: 2px;
-            height: 100%;
-            background: linear-gradient(180deg, transparent, #03e9f4);
-            animation: btn-anim2 1s linear infinite;
-            animation-delay: .25s
-        }
-
-        @keyframes btn-anim2 {
-            0% {
-                top: -100%;
-            }
-
-            50%,
-            100% {
-                top: 100%;
-            }
-        }
-
-        .login-box button span:nth-child(3) {
-            bottom: 0;
-            right: -100%;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(270deg, transparent, #03e9f4);
-            animation: btn-anim3 1s linear infinite;
-            animation-delay: .5s
-        }
-
-        @keyframes btn-anim3 {
-            0% {
-                right: -100%;
-            }
-
-            50%,
-            100% {
-                right: 100%;
-            }
-        }
-
-        .login-box button span:nth-child(4) {
-            bottom: -100%;
-            left: 0;
-            width: 2px;
-            height: 100%;
-            background: linear-gradient(360deg, transparent, #03e9f4);
-            animation: btn-anim4 1s linear infinite;
-            animation-delay: .75s
-        }
-
-        @keyframes btn-anim4 {
-            0% {
-                bottom: -100%;
-            }
-
-            50%,
-            100% {
-                bottom: 100%;
-            }
-        }
     </style>
-    <script src="node_modules/animejs/lib/anime.min.js"></script>
+    <link rel="stylesheet" href="portal.css">
 </head>
 
 <body>
+    <nav class="portal-topbar" aria-label="Main navigation">
+        <a class="portal-brand" href="http://localhost:3000/index.html">
+            <span class="brand-mark">C</span>
+            <span class="brand-name">CCD <small>PORTAL</small></span>
+        </a>
+        <div class="portal-nav-links">
+            <a href="http://localhost:4000/">Search</a>
+            <a href="http://localhost:3000/">Students</a>
+            <a href="http://localhost:5000/">Instructors</a>
+            <a href="http://localhost:3000/aboutCollege.html">Departments</a>
+        </div>
+        <a class="portal-home-link" href="http://localhost:3000/index.html">Workspace <span aria-hidden="true">↗</span></a>
+    </nav>
 
+    <script>
+        if (window.location.protocol === 'file:') {
+            window.location.replace('http://localhost:3000/login');
+        }
+    </script>
     <canvas id="canvas"></canvas>
     <div class="login-box">
         <form>
-            <h2>CCD Portal Login Page</h2>
+            <h2 id="form-title">CCD Portal Login Page</h2>
+            <p id="form-help" class="form-help">
+                Sign in with your username or linked email. Older accounts can link an email below.
+            </p>
 
             <div class="user-box">
-                <input type="text" id="username" name="username" required>
-                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" placeholder=" " maxlength="254"
+                    autocomplete="username" required>
+                <label id="username-label" for="username">Username or email:</label>
+            </div>
+
+            <div class="user-box" id="email-box" hidden>
+                <input type="email" id="email" name="email" placeholder=" " maxlength="254"
+                    autocomplete="email">
+                <label for="email">Email address:</label>
             </div>
 
             <div class="user-box">
-                <input type="password" id="password" name="password" required>
+                <input class="password-input" type="password" id="password" name="password" placeholder=" " minlength="10" maxlength="128"
+                    autocomplete="current-password" required>
                 <label for="password">Password:</label>
+                <button class="password-toggle" type="button" data-password-target="password"
+                    aria-label="Show password" title="Show password" aria-pressed="false">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path class="eye-slash" d="m3 3 18 18"></path>
+                    </svg>
+                </button>
             </div>
 
-            <button class="but1" onclick="validate()">Submit
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
+            <div class="user-box" id="confirm-password-box" hidden>
+                <input class="password-input" type="password" id="confirm-password" name="confirm-password" placeholder=" "
+                    minlength="10" maxlength="128" autocomplete="new-password">
+                <label for="confirm-password">Confirm password:</label>
+                <button class="password-toggle" type="button" data-password-target="confirm-password"
+                    aria-label="Show confirm password" title="Show confirm password" aria-pressed="false">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path class="eye-slash" d="m3 3 18 18"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <p id="form-message" role="status" aria-live="polite" style="color: white;"></p>
+            <button class="but1" id="submit-button" type="submit"><span id="submit-label">Submit</span></button>
+            <p style="color: white; text-align: center;">
+                <span id="mode-prompt">New here?</span>
+                <button class="but1" id="mode-button" type="button">Create an account</button>
+            </p>
+            <p id="link-email-prompt" style="color: white; text-align: center;">
+                Already registered?
+                <button class="but1" id="link-email-button" type="button">Link an email address</button>
+            </p>
         </form>
     </div>
     <script>
-        function validate() {
-            event.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            if (username === 'admin' && password === 'iiita123') {
-                window.location.href = 'index.html';
+        const form = document.querySelector('form');
+        const passwordInput = document.querySelector('#password');
+        const confirmPassword = document.querySelector('#confirm-password');
+        const confirmBox = document.querySelector('#confirm-password-box');
+        const usernameInput = document.querySelector('#username');
+        const usernameLabel = document.querySelector('#username-label');
+        const emailInput = document.querySelector('#email');
+        const emailBox = document.querySelector('#email-box');
+        const message = document.querySelector('#form-message');
+        const formHelp = document.querySelector('#form-help');
+        const title = document.querySelector('#form-title');
+        const submitLabel = document.querySelector('#submit-label');
+        const modePrompt = document.querySelector('#mode-prompt');
+        const modeButton = document.querySelector('#mode-button');
+        const linkEmailPrompt = document.querySelector('#link-email-prompt');
+        const linkEmailButton = document.querySelector('#link-email-button');
+        const apiBase = 'http://localhost:3000';
+        let mode = 'login';
+
+        document.querySelectorAll('.password-toggle').forEach(button => {
+            button.addEventListener('click', () => {
+                const input = document.getElementById(button.dataset.passwordTarget);
+                const showing = input.type === 'password';
+                input.type = showing ? 'text' : 'password';
+                button.setAttribute('aria-pressed', String(showing));
+                button.setAttribute(
+                    'aria-label',
+                    `${showing ? 'Hide' : 'Show'} ${input.id === 'password' ? 'password' : 'confirm password'}`
+                );
+                button.title = button.getAttribute('aria-label');
+                input.focus();
+            });
+        });
+
+        function setMode(nextMode) {
+            mode = nextMode;
+            const registering = mode === 'register';
+            const linkingEmail = mode === 'link-email';
+            title.textContent = registering
+                ? 'Create Your Account'
+                : linkingEmail
+                    ? 'Link Email to Account'
+                    : 'CCD Portal Login Page';
+            formHelp.textContent = registering
+                ? 'Create an account with a username, email address and password.'
+                : linkingEmail
+                    ? 'Enter your existing username and password, then add the email you want to use for sign-in.'
+                    : 'Sign in with your username or linked email. Older accounts can link an email below.';
+            submitLabel.textContent = registering ? 'Register' : linkingEmail ? 'Save Email' : 'Submit';
+            modePrompt.textContent = registering
+                ? 'Already have an account?'
+                : linkingEmail
+                    ? 'Back to sign in?'
+                    : 'New here?';
+            modeButton.textContent = registering
+                ? 'Log in'
+                : linkingEmail
+                    ? 'Back to login'
+                    : 'Create an account';
+            usernameLabel.textContent = registering || linkingEmail ? 'Username:' : 'Username or email:';
+            usernameInput.maxLength = registering || linkingEmail ? 32 : 254;
+            usernameInput.minLength = registering || linkingEmail ? 3 : 0;
+            if (registering || linkingEmail) {
+                usernameInput.pattern = '[A-Za-z0-9_]{3,32}';
             } else {
-                alert('Invalid username or password.');
+                usernameInput.removeAttribute('pattern');
             }
+            emailBox.hidden = !registering && !linkingEmail;
+            emailInput.required = registering || linkingEmail;
+            confirmBox.hidden = !registering;
+            confirmPassword.required = registering;
+            passwordInput.autocomplete = registering ? 'new-password' : 'current-password';
+            linkEmailPrompt.hidden = mode !== 'login';
+            message.textContent = '';
+            message.style.color = 'white';
         }
 
+        modeButton.addEventListener('click', () => {
+            setMode(mode === 'login' ? 'register' : 'login');
+        });
+
+        linkEmailButton.addEventListener('click', () => {
+            setMode('link-email');
+        });
+
+        form.addEventListener('submit', async event => {
+            event.preventDefault();
+            message.textContent = '';
+            message.style.color = 'white';
+
+            if (mode === 'register' && passwordInput.value !== confirmPassword.value) {
+                message.textContent = 'Passwords do not match.';
+                message.style.color = '#ff8080';
+                return;
+            }
+
+            const endpoint = mode === 'register'
+                ? 'register'
+                : mode === 'link-email'
+                    ? 'link-email'
+                    : 'login';
+            try {
+                const response = await fetch(`${apiBase}/auth/${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: usernameInput.value,
+                        email: emailInput.value,
+                        identifier: usernameInput.value,
+                        password: passwordInput.value
+                    })
+                });
+                if (!response.headers.get('content-type')?.includes('application/json')) {
+                    const responseText = await response.text();
+                    console.error('Authentication endpoint returned a non-JSON response:', responseText);
+                    throw new Error('Could not reach the login service. Open http://localhost:3000/login and make sure npm start is running.');
+                }
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.message || 'Request failed.');
+                }
+
+                message.textContent = result.message;
+                message.style.color = '#03e9f4';
+                if (mode === 'register') {
+                    form.reset();
+                    setMode('login');
+                    message.textContent = result.message;
+                    message.style.color = '#03e9f4';
+                    window.location.href = `${apiBase}/index.html`;
+                } else if (mode === 'link-email') {
+                    const linkedEmail = emailInput.value.trim();
+                    form.reset();
+                    setMode('login');
+                    usernameInput.value = linkedEmail;
+                    message.textContent = result.message;
+                    message.style.color = '#03e9f4';
+                } else {
+                    window.location.href = `${apiBase}/index.html`;
+                }
+            } catch (error) {
+                message.textContent = error instanceof TypeError
+                    ? 'Could not connect to the login service. Start or restart the app with npm start, then open http://localhost:3000/login.'
+                    : error.message || 'Could not connect to the server.';
+                message.style.color = '#ff8080';
+            }
+        });
     </script>
     <script>
         // Initialize variables

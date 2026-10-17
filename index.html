@@ -2,49 +2,77 @@
 <html>
 
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>College Database</title>
   <link rel="stylesheet" type="text/css" href="style1.css">
+  <link rel="stylesheet" href="portal.css">
 </head>
 
 <body>
   <canvas id="canvas"></canvas>
 
-  <div class="container">
-    <div class="gst">
-      <h1>Centralized College Database</h1>
-      <a href="http://localhost:4000/" class="button" id="searchButton">Search Database</a>
-      <a href="http://localhost:3000/" class="button" id="addButton">Add Student</a>
-      <a href="http://localhost:5000/" class="button" id="addButton">Add/Delete Instructor</a>
-      <a href="aboutCollege.html" class="button" id="aboutButton">About College</a>
-      <a href="https://www.youtube.com/watch?v=QNXvE1BZu8g" class="button" id="aboutButton">Dpt Mod</a>
-    </div>
-  </div>
-
-  <script src="node_modules/animejs/lib/anime.min.js"></script>
-  <script>
-    const buttons = document.querySelectorAll('.button');
-
-    buttons.forEach(button => {
-      button.addEventListener('mouseenter', () => {
-        anime({
-          targets: button,
-          translateY: [
-            { value: '-5px', duration: 300 },
-            { value: '5px', duration: 300 },
-            { value: '0px', duration: 300 },
-          ],
-          easing: 'linear',
-          loop: true,
-        });
-      });
-
-      button.addEventListener('mouseleave', () => {
-        anime.remove(button);
-        button.style.transform = '';
-      });
-    });
-
-  </script>
+  <main class="container">
+    <section class="gst" aria-labelledby="dashboard-title">
+      <nav class="portal-topbar" aria-label="Main navigation">
+        <a class="portal-brand" href="http://localhost:3000/index.html">
+          <span class="brand-mark">C</span>
+          <span class="brand-name">CCD <small>PORTAL</small></span>
+        </a>
+        <div class="portal-nav-links">
+          <a href="http://localhost:4000/">Search</a>
+          <a href="http://localhost:3000/">Students</a>
+          <a href="http://localhost:5000/">Instructors</a>
+          <a href="http://localhost:3000/aboutCollege.html">Departments</a>
+        </div>
+        <a class="portal-home-link is-current" href="http://localhost:3000/index.html">Workspace</a>
+      </nav>
+      <div class="dashboard-heading">
+        <div>
+          <p class="eyebrow">CENTRALIZED COLLEGE DATABASE <span class="live-indicator">LIVE WORKSPACE</span></p>
+          <h1 id="dashboard-title">Your college, in one place.</h1>
+          <p class="intro">A connected workspace for student records, courses and academic teams.</p>
+        </div>
+        <div class="workspace-stamp" aria-label="Five tools available">
+          <strong>05</strong>
+          <span>PORTAL TOOLS</span>
+        </div>
+      </div>
+      <nav class="dashboard-links" aria-label="Dashboard">
+        <a href="http://localhost:4000/" class="button">
+          <span class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.3"></circle><path d="m16 16 4.5 4.5"></path><path d="M8.5 10.8h4.6M10.8 8.5v4.6"></path></svg></span>
+          <span class="button-title">Search database</span>
+          <span class="button-description">Find student and course records</span>
+          <span class="card-arrow" aria-hidden="true">↗</span>
+        </a>
+        <a href="http://localhost:3000/" class="button">
+          <span class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"></circle><path d="M3.5 19c.5-3.1 2.4-4.8 5.5-4.8s5 1.7 5.5 4.8M17 8v6M14 11h6"></path></svg></span>
+          <span class="button-title">Add a student</span>
+          <span class="button-description">Enroll a student in a course</span>
+          <span class="card-arrow" aria-hidden="true">↗</span>
+        </a>
+        <a href="http://localhost:5000/" class="button">
+          <span class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"></circle><path d="M3.5 19c.5-3.1 2.4-4.8 5.5-4.8s5 1.7 5.5 4.8M17 7h4M17 11h4M17 15h4"></path></svg></span>
+          <span class="button-title">Manage instructors</span>
+          <span class="button-description">Add or remove instructor records</span>
+          <span class="card-arrow" aria-hidden="true">↗</span>
+        </a>
+        <a href="aboutCollege.html" class="button">
+          <span class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="5" rx="1"></rect><rect x="14" y="15" width="6" height="5" rx="1"></rect><rect x="4" y="15" width="6" height="5" rx="1"></rect><path d="M7 9v3h10v3"></path></svg></span>
+          <span class="button-title">Explore departments</span>
+          <span class="button-description">View departments and their courses</span>
+          <span class="card-arrow" aria-hidden="true">↗</span>
+        </a>
+        <a href="https://www.youtube.com/watch?v=QNXvE1BZu8g" class="button" target="_blank" rel="noopener noreferrer">
+          <span class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="m10 9 5 3-5 3z"></path></svg></span>
+          <span class="button-title">Department video</span>
+          <span class="button-description">Opens in a new tab</span>
+          <span class="card-arrow" aria-hidden="true">↗</span>
+        </a>
+      </nav>
+      <footer class="dashboard-footer"><span>ACADEMIC RECORDS MANAGEMENT</span><span>CCD <i></i> CENTRALIZED COLLEGE DATABASE</span></footer>
+    </section>
+  </main>
 
   <script>
     // Initialize variables
@@ -53,8 +81,15 @@
     let particlesArray;
 
     // Set canvas dimensions to match the window size
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    function resizeCanvas() {
+      const pixelRatio = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * pixelRatio;
+      canvas.height = window.innerHeight * pixelRatio;
+      canvas.style.width = `${window.innerWidth}px`;
+      canvas.style.height = `${window.innerHeight}px`;
+      ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+      if (particlesArray) init();
+    }
 
     // Create Particle class
     class Particle {
@@ -78,10 +113,10 @@
       // Update particle position and check for collisions
       update() {
         // If particle goes outside the canvas, invert its direction
-        if (this.x + this.size > canvas.width || this.x - this.size < 0) {
+        if (this.x + this.size > window.innerWidth || this.x - this.size < 0) {
           this.directionX = -this.directionX;
         }
-        if (this.y + this.size > canvas.height || this.y - this.size < 0) {
+        if (this.y + this.size > window.innerHeight || this.y - this.size < 0) {
           this.directionY = -this.directionY;
         }
 
@@ -97,11 +132,11 @@
     // Create array of particles
     function init() {
       particlesArray = [];
-      const numberOfParticles = 100;
+      const numberOfParticles = Math.min(100, Math.round(window.innerWidth * window.innerHeight / 12000));
       for (let i = 0; i < numberOfParticles; i++) {
         const size = Math.random() * 5 + 1;
-        const x = Math.random() * (canvas.width - size * 2) + size;
-        const y = Math.random() * (canvas.height - size * 2) + size;
+        const x = Math.random() * (window.innerWidth - size * 2) + size;
+        const y = Math.random() * (window.innerHeight - size * 2) + size;
         const directionX = Math.random() * 5 - 2.5;
         const directionY = Math.random() * 5 - 2.5;
 
@@ -113,7 +148,7 @@
     // Animation loop
     function animate() {
       requestAnimationFrame(animate);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
       for (let i = 0; i < particlesArray.length; i++) {
         particlesArray[i].update();
@@ -121,6 +156,8 @@
     }
 
     // Initialize and start animation
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
     init();
     animate();
 

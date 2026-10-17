@@ -14,6 +14,10 @@ const dbConfig = {
 // Create a connection to the MySQL database
 const connection = mysql.createConnection(dbConfig);
 
+app.get('/__health/search', (req, res) => {
+    res.json({ service: 'search' });
+});
+
 // Connect to the database
 connection.connect((err) => {
     if (err) throw err;
@@ -22,6 +26,10 @@ connection.connect((err) => {
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'searchFilter.html'));
+});
+
+app.get('/portal.css', (req, res) => {
+    res.sendFile(path.join(__dirname, 'portal.css'));
 });
 
 app.use(express.static('DBMS PROJECT'));
@@ -83,6 +91,14 @@ app.get('/search', (req, res) => {
 
 // Start the server
 const port = Number(process.env.SEARCH_PORT) || 4000;
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log(`Search server started on port ${port}`);
+});
+server.on('error', error => {
+    if (error.code === 'EADDRINUSE') {
+        console.error(`Search service cannot start: port ${port} is already in use. Stop the existing app or set SEARCH_PORT to a free port.`);
+    } else {
+        console.error('Search service failed to start:', error.message);
+    }
+    process.exit(1);
 });

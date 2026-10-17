@@ -14,6 +14,10 @@ const dbConfig = {
 // Set up MySQL connection
 const connection = mysql.createConnection(dbConfig);
 
+app.get('/__health/instructor', (req, res) => {
+  res.json({ service: 'instructor' });
+});
+
 // Connect to MySQL
 connection.connect((err) => {
   if (err) throw err;
@@ -26,6 +30,10 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'instructor.html'));
   });
+
+app.get('/portal.css', (req, res) => {
+  res.sendFile(path.join(__dirname, 'portal.css'));
+});
 
 app.get('/departments', (req, res) => {
   connection.query(
@@ -117,6 +125,14 @@ app.post('/', (req, res) => {
 
 // Start the server
 const port = Number(process.env.INSTRUCTOR_PORT) || 5000;
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Instructor server started on port ${port}`);
+});
+server.on('error', error => {
+  if (error.code === 'EADDRINUSE') {
+    console.error(`Instructor service cannot start: port ${port} is already in use. Stop the existing app or set INSTRUCTOR_PORT to a free port.`);
+  } else {
+    console.error('Instructor service failed to start:', error.message);
+  }
+  process.exit(1);
 });

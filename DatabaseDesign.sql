@@ -10,6 +10,15 @@ INSERT IGNORE INTO department (department_id, department_name) VALUES
   (4, 'English'),
   (5, 'History');
 
+CREATE TABLE IF NOT EXISTS app_users (
+  user_id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(32) NOT NULL UNIQUE,
+  email VARCHAR(254) NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  UNIQUE KEY uq_app_users_email (email),
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS instructor (
   instructor_id INT PRIMARY KEY,
   instructor_name VARCHAR(255),

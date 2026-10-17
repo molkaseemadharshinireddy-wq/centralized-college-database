@@ -184,13 +184,15 @@ npm install
 npm start
 ```
 
-The startup script initializes the database before starting the student, search, and instructor services on ports 3000, 4000, and 5000. You can override these ports with `PORT`, `SEARCH_PORT`, and `INSTRUCTOR_PORT`. Open `index.html` in your browser to access the homepage:
+The startup script initializes the database and starts the student, search, and instructor services on ports 3000, 4000, and 5000. You can override these ports with `PORT`, `SEARCH_PORT`, and `INSTRUCTOR_PORT`. If you run `npm start` again while this app's services are already running, the launcher reuses them instead of failing or starting duplicates. If a port is occupied by another application, stop that application or configure a different port. Open `index.html` in your browser to access the homepage:
 
 ```text
 index.html
 ```
 
 To initialize the database without starting the servers, run `npm run db:setup`. This also adds any missing default departments and courses, making the student form's course IDs valid.
+
+The login page supports account registration with a username, email address, and password. Users can log in with either their username or a linked email address (email matching is case-insensitive). Existing accounts do not have an email address automatically assigned: from the login page, select **Link an email address**, enter the account's existing username and password, then enter the email address to link. After it is linked, use that email address and the same password to log in. Startup adds the email column and unique email index to existing account tables without deleting existing accounts. Passwords are stored as salted hashes. Registration and login do not currently restrict direct access to the application's other pages or API endpoints.
 
 ## Security and Data Integrity
 

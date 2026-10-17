@@ -2,16 +2,34 @@
 <html>
 
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>About College</title>
     <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" href="portal.css">
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="node_modules/animejs/lib/anime.min.js"></script>
 </head>
 
 <body>
 
-    <header>
+    <nav class="portal-topbar" aria-label="Main navigation">
+        <a class="portal-brand" href="http://localhost:3000/index.html">
+            <span class="brand-mark">C</span>
+            <span class="brand-name">CCD <small>PORTAL</small></span>
+        </a>
+        <div class="portal-nav-links">
+            <a href="http://localhost:4000/">Search</a>
+            <a href="http://localhost:3000/">Students</a>
+            <a href="http://localhost:5000/">Instructors</a>
+            <a class="is-current" href="http://localhost:3000/aboutCollege.html">Departments</a>
+        </div>
+        <a class="portal-home-link" href="http://localhost:3000/index.html">Workspace <span aria-hidden="true">↗</span></a>
+    </nav>
+
+    <header class="department-heading">
         <h1>College-Department Structure</h1>
+        <p>Explore how academic departments connect to their courses.</p>
     </header>
     <div id="tree-container"></div>
     <script src="tree.js"></script>
